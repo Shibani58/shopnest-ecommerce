@@ -7,6 +7,10 @@ product, category and order management.
 
 ![CI](https://github.com/Shibani58/shopnest-ecommerce/actions/workflows/ci.yml/badge.svg)
 
+**Live demo:** https://shopnest-ecommerce-bice.vercel.app · **API docs:** https://shopnest-api-eos1.onrender.com/swagger-ui.html
+
+> Hosted on free tiers: if the shop has been idle, the first load can take up to a minute while the API wakes up.
+
 ## Features
 
 **Shoppers**
