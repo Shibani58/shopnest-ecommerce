@@ -42,3 +42,8 @@ management:
     web:
       exposure:
         include: health
+  health:
+    db:
+      # Render and the keep-awake job poll /actuator/health; skipping the DB check lets the
+      # free Neon database sleep when nobody is shopping, saving its compute hours.
+      enabled: false
