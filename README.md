@@ -125,3 +125,8 @@ All settings are environment variables (see `backend/src/main/resources/applicat
 Product names, descriptions and images in the demo catalogue come from the public
 [DummyJSON](https://dummyjson.com) test API. The project idea was inspired by the
 EmbarkX Spring Boot e-commerce course; this is an independent implementation with an Angular frontend.
+
+## Author
+
+Built by **Shibani Purbey**, Full Stack Software Developer (Java · Spring Boot + Angular).
+[Portfolio](https://shibani58.github.io) · [GitHub](https://github.com/Shibani58) · [LinkedIn](https://www.linkedin.com/in/shibani-purbey/)
