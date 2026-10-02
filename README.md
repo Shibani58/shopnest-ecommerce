@@ -106,11 +106,11 @@ All settings are environment variables (see `backend/src/main/resources/applicat
 
 ## Deploy
 
-1. **Database** – create a free PostgreSQL database (e.g. [Neon](https://neon.tech)) and note the JDBC URL,
-   user and password.
+1. **Database** – create a free PostgreSQL database (e.g. [Neon](https://neon.tech)) and copy its
+   connection string (`postgresql://user:password@host/db?sslmode=require`).
 2. **Backend** – on [Render](https://render.com) choose *New → Blueprint* and select this repo
-   (`render.yaml`). Fill in `DB_URL` (`jdbc:postgresql://<host>/<db>?sslmode=require`), `DB_USERNAME`,
-   `DB_PASSWORD`, `ADMIN_PASSWORD` and `CORS_ORIGINS` (your Vercel URL).
+   (`render.yaml`). Paste the connection string unchanged into `DB_URL` (the app converts it to JDBC)
+   and choose an `ADMIN_PASSWORD`.
 3. **Frontend** – in `frontend/vercel.json` replace `YOUR-BACKEND.onrender.com` with your Render URL,
    commit, then import the repo on [Vercel](https://vercel.com) with **Root Directory = `frontend`**.
 
