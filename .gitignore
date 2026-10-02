@@ -1,0 +1,20 @@
+# Backend
+backend/target/
+*.class
+*.log
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/out-tsc/
+
+# IDE / OS
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Local secrets
+.env

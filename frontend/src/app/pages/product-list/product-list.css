@@ -1,0 +1,21 @@
+.header { margin-bottom: 1.25rem; align-items: flex-end; }
+.header h1 { margin-bottom: 0.15rem; }
+.sort { width: auto; min-width: 180px; padding-block: 0.45rem; }
+.layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 1.5rem; align-items: start; }
+.filters { position: sticky; top: 80px; display: flex; flex-direction: column; gap: 1.25rem; }
+.filter-group { display: flex; flex-direction: column; gap: 0.4rem; }
+.filter-group h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.2rem; }
+.chip { text-align: left; background: none; border: 0; padding: 0.35rem 0.6rem; border-radius: var(--radius); color: var(--text); font: inherit; cursor: pointer; }
+.chip:hover { background: var(--surface-muted); }
+.chip.active { background: var(--primary-soft); color: var(--primary); font-weight: 600; }
+.price-inputs { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.4rem; }
+.price-inputs .input { padding: 0.45rem 0.55rem; }
+.filter-check { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
+.filter-toggle { display: none; }
+
+@media (max-width: 860px) {
+  .layout { grid-template-columns: 1fr; }
+  .filter-toggle { display: inline-flex; }
+  .filters { display: none; position: static; }
+  .filters.open { display: flex; }
+}

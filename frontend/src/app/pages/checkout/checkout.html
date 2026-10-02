@@ -1,0 +1,123 @@
+<div class="container section">
+  <h1>Checkout</h1>
+
+  @if (cartService.cart(); as cart) {
+    @if (cart.items.length === 0) {
+      <div class="empty panel">
+        <h2>Your cart is empty</h2>
+        <a routerLink="/products" class="btn btn-primary">Browse products</a>
+      </div>
+    } @else {
+      <div class="layout">
+        <div class="stack">
+          <section class="panel" [formGroup]="address">
+            <h2><span class="step">1</span> Delivery address</h2>
+            <div class="form-grid">
+              <div class="field">
+                <label for="recipientName">Full name</label>
+                <input id="recipientName" formControlName="recipientName" autocomplete="name" />
+              </div>
+              <div class="field">
+                <label for="phone">Phone</label>
+                <input id="phone" type="tel" formControlName="phone" autocomplete="tel" placeholder="98765 43210" />
+                @if (invalid('phone')) {
+                  <span class="field-error">Enter a valid phone number.</span>
+                }
+              </div>
+              <div class="field full">
+                <label for="line1">Address line 1</label>
+                <input id="line1" formControlName="line1" autocomplete="address-line1" placeholder="House no., street" />
+              </div>
+              <div class="field full">
+                <label for="line2">Address line 2 <span class="muted">(optional)</span></label>
+                <input id="line2" formControlName="line2" autocomplete="address-line2" placeholder="Area, landmark" />
+              </div>
+              <div class="field">
+                <label for="city">City</label>
+                <input id="city" formControlName="city" autocomplete="address-level2" />
+              </div>
+              <div class="field">
+                <label for="state">State</label>
+                <input id="state" formControlName="state" autocomplete="address-level1" />
+              </div>
+              <div class="field">
+                <label for="postalCode">PIN code</label>
+                <input id="postalCode" formControlName="postalCode" autocomplete="postal-code" />
+                @if (invalid('postalCode')) {
+                  <span class="field-error">Enter a valid PIN code.</span>
+                }
+              </div>
+              <div class="field">
+                <label for="country">Country</label>
+                <input id="country" formControlName="country" autocomplete="country-name" />
+              </div>
+            </div>
+          </section>
+
+          <section class="panel" [formGroup]="payment">
+            <h2><span class="step">2</span> Payment</h2>
+            <div class="methods">
+              <label class="method" [class.selected]="method() === 'CARD'">
+                <input type="radio" formControlName="method" value="CARD" />
+                <span><strong>Credit / debit card</strong><br /><span class="muted small">Confirmed instantly</span></span>
+              </label>
+              <label class="method" [class.selected]="method() === 'CASH_ON_DELIVERY'">
+                <input type="radio" formControlName="method" value="CASH_ON_DELIVERY" />
+                <span><strong>Cash on delivery</strong><br /><span class="muted small">Pay when it arrives</span></span>
+              </label>
+            </div>
+
+            @if (method() === 'CARD') {
+              <div class="alert alert-info small test-card">
+                Demo store, no real money moves. Use test card <strong>4242 4242 4242 4242</strong> (any future
+                expiry, any CVV), or a card ending in <strong>0002</strong> to see a decline.
+                <button type="button" class="link-btn" (click)="useTestCard()">Fill test card</button>
+              </div>
+              <div class="form-grid">
+                <div class="field full">
+                  <label for="number">Card number</label>
+                  <input id="number" formControlName="number" inputmode="numeric" autocomplete="off" placeholder="1234 5678 9012 3456" (input)="formatCardNumber($event)" />
+                </div>
+                <div class="field">
+                  <label for="expiry">Expiry (MM/YY)</label>
+                  <input id="expiry" formControlName="expiry" inputmode="numeric" autocomplete="off" placeholder="MM/YY" (input)="formatExpiry($event)" />
+                </div>
+                <div class="field">
+                  <label for="cvv">CVV</label>
+                  <input id="cvv" formControlName="cvv" inputmode="numeric" autocomplete="off" maxlength="4" placeholder="123" />
+                </div>
+              </div>
+            }
+          </section>
+        </div>
+
+        <aside class="panel summary">
+          <h2>Order summary</h2>
+          <ul class="lines">
+            @for (item of cart.items; track item.productId) {
+              <li>
+                <span class="line-name">{{ item.name }} <span class="muted">× {{ item.quantity }}</span></span>
+                <span>{{ item.lineTotal | currency: 'INR' }}</span>
+              </li>
+            }
+          </ul>
+          <div class="sum-row"><span>Subtotal</span><span>{{ cart.subtotal | currency: 'INR' }}</span></div>
+          <div class="sum-row">
+            <span>Delivery</span>
+            <span>{{ cart.shippingFee > 0 ? (cart.shippingFee | currency: 'INR') : 'FREE' }}</span>
+          </div>
+          <div class="sum-row total"><span>Total</span><span>{{ cart.total | currency: 'INR' }}</span></div>
+          @if (error()) {
+            <div class="alert alert-error small" role="alert">{{ error() }}</div>
+          }
+          <button type="button" class="btn btn-primary btn-block" [disabled]="placing()" (click)="placeOrder()">
+            {{ placing() ? 'Placing order…' : 'Place order · ' + (cart.total | currency: 'INR') }}
+          </button>
+          <a routerLink="/cart" class="small center">← Back to cart</a>
+        </aside>
+      </div>
+    }
+  } @else {
+    <div class="spinner" aria-label="Loading"></div>
+  }
+</div>

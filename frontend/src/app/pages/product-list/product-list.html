@@ -1,0 +1,86 @@
+<div class="container section">
+  <div class="row-between header">
+    <div>
+      <h1>{{ heading() }}</h1>
+      @if (result().page; as page) {
+        <p class="muted small">{{ page.totalElements }} {{ page.totalElements === 1 ? 'product' : 'products' }}</p>
+      }
+    </div>
+    <div class="row">
+      <button type="button" class="btn btn-ghost btn-sm filter-toggle" (click)="filtersOpen.set(!filtersOpen())">
+        Filters
+      </button>
+      <label class="sr-only" for="sort">Sort by</label>
+      <select id="sort" class="input sort" [ngModel]="query().sort" (ngModelChange)="update({ sort: $event })">
+        @for (o of sortOptions; track o.value) {
+          <option [value]="o.value">{{ o.label }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <div class="layout">
+    <aside class="filters panel" [class.open]="filtersOpen()">
+      <div class="filter-group">
+        <h3>Category</h3>
+        <button type="button" class="chip" [class.active]="!query().categoryId" (click)="update({ categoryId: null })">
+          All
+        </button>
+        @for (c of categories(); track c.id) {
+          <button
+            type="button"
+            class="chip"
+            [class.active]="query().categoryId === c.id"
+            (click)="update({ categoryId: c.id })"
+          >
+            {{ c.name }}
+          </button>
+        }
+      </div>
+
+      <form class="filter-group" (ngSubmit)="applyPrice()">
+        <h3>Price (₹)</h3>
+        <div class="price-inputs">
+          <input class="input" type="number" min="0" name="min" placeholder="Min" [(ngModel)]="minPrice" aria-label="Minimum price" />
+          <span class="muted">–</span>
+          <input class="input" type="number" min="0" name="max" placeholder="Max" [(ngModel)]="maxPrice" aria-label="Maximum price" />
+        </div>
+        <button type="submit" class="btn btn-ghost btn-sm btn-block">Apply</button>
+      </form>
+
+      <label class="filter-check">
+        <input type="checkbox" [checked]="query().inStock" (change)="update({ inStock: $any($event.target).checked || null })" />
+        In stock only
+      </label>
+
+      <button type="button" class="link-btn small" (click)="clearAll()">Clear all filters</button>
+    </aside>
+
+    <section class="results">
+      @if (result().error; as error) {
+        <div class="alert alert-error">{{ error }}</div>
+      } @else if (result().loading) {
+        <div class="product-grid">
+          @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+            <div class="skeleton" style="height: 340px"></div>
+          }
+        </div>
+      } @else if (result().page; as page) {
+        @if (page.content.length) {
+          <div class="product-grid">
+            @for (p of page.content; track p.id) {
+              <app-product-card [product]="p" />
+            }
+          </div>
+          <app-pager [page]="page.page" [totalPages]="page.totalPages" (pageChange)="goToPage($event)" />
+        } @else {
+          <div class="empty">
+            <h2>No products match</h2>
+            <p>Try a different search or remove some filters.</p>
+            <button type="button" class="btn btn-ghost" (click)="clearAll()">Clear filters</button>
+          </div>
+        }
+      }
+    </section>
+  </div>
+</div>

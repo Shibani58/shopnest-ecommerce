@@ -1,0 +1,96 @@
+<div class="container section">
+  @if (error()) {
+    <div class="empty">
+      <h2>Order not found</h2>
+      <p>{{ error() }}</p>
+      <a routerLink="/orders" class="btn btn-ghost">Back to my orders</a>
+    </div>
+  } @else if (order(); as order) {
+    @if (placed()) {
+      <div class="alert alert-success thanks">
+        <strong>Thank you! Your order has been placed.</strong>
+        {{ order.paymentMethod === 'CARD' ? 'Payment received and the order is confirmed.' : 'Please keep the amount ready on delivery.' }}
+      </div>
+    }
+
+    <div class="row-between head">
+      <div>
+        <a routerLink="/orders" class="small">← My orders</a>
+        <h1>Order #{{ order.id }}</h1>
+        <p class="muted small">Placed {{ order.createdAt | date: 'medium' }}</p>
+      </div>
+      <div class="row">
+        <app-status-badge [status]="order.status" />
+        @if (canCancel()) {
+          <button type="button" class="btn btn-danger btn-sm" [disabled]="cancelling()" (click)="cancel(order)">
+            {{ cancelling() ? 'Cancelling…' : 'Cancel order' }}
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (order.status !== 'CANCELLED') {
+      <ol class="panel timeline" aria-label="Order progress">
+        @for (step of steps; track step; let i = $index) {
+          <li [class.done]="i <= stepIndex()" [class.current]="i === stepIndex()">
+            <span class="dot">{{ i < stepIndex() ? '✓' : i + 1 }}</span>
+            <span class="label">{{ step }}</span>
+          </li>
+        }
+      </ol>
+    } @else {
+      <div class="alert alert-error">This order was cancelled on {{ order.updatedAt | date: 'medium' }}. Items were returned to stock.</div>
+    }
+
+    <div class="layout">
+      <section class="panel">
+        <h2>Items</h2>
+        @for (item of order.items; track $index) {
+          <div class="item">
+            <span class="thumb"><app-product-image [src]="item.imageUrl" [alt]="item.productName" /></span>
+            <div class="grow">
+              @if (item.productId) {
+                <a [routerLink]="['/products', item.productId]">{{ item.productName }}</a>
+              } @else {
+                <span>{{ item.productName }}</span>
+              }
+              <div class="muted small">{{ item.unitPrice | currency: 'INR' }} × {{ item.quantity }}</div>
+            </div>
+            <strong>{{ item.lineTotal | currency: 'INR' }}</strong>
+          </div>
+        }
+      </section>
+
+      <aside class="stack">
+        <section class="panel">
+          <h2>Payment</h2>
+          <div class="sum-row"><span>Subtotal</span><span>{{ order.subtotal | currency: 'INR' }}</span></div>
+          <div class="sum-row"><span>Delivery</span><span>{{ order.shippingFee > 0 ? (order.shippingFee | currency: 'INR') : 'FREE' }}</span></div>
+          <div class="sum-row total"><span>Total</span><span>{{ order.total | currency: 'INR' }}</span></div>
+          <p class="muted small">
+            {{ order.paymentMethod === 'CARD' ? 'Paid by card' : 'Cash on delivery' }}
+            @if (order.paymentReference && order.paymentReference !== 'COD') {
+              · {{ order.paymentReference }}
+            }
+          </p>
+        </section>
+        <section class="panel">
+          <h2>Delivering to</h2>
+          @let a = order.shippingAddress;
+          <address>
+            <strong>{{ a.recipientName }}</strong><br />
+            {{ a.line1 }}<br />
+            @if (a.line2) {
+              {{ a.line2 }}<br />
+            }
+            {{ a.city }}, {{ a.state }} {{ a.postalCode }}<br />
+            {{ a.country }}<br />
+            <span class="muted">{{ a.phone }}</span>
+          </address>
+        </section>
+      </aside>
+    </div>
+  } @else {
+    <div class="spinner" aria-label="Loading"></div>
+  }
+</div>

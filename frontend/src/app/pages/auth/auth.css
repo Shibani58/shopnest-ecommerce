@@ -1,0 +1,5 @@
+.auth-wrap { display: grid; place-items: center; padding: 3rem 16px; }
+.auth-card { width: 100%; max-width: 420px; padding: 2rem; }
+.auth-card h1 { margin-bottom: 0.25rem; }
+.center { text-align: center; margin: 0; }
+.demo { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; padding: 0.75rem; border-radius: var(--radius); background: var(--surface-muted); }

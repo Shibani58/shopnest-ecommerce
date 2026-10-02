@@ -1,0 +1,22 @@
+# Render blueprint for the backend API (Dashboard -> New -> Blueprint -> pick this repo).
+# The database URL and credentials are entered in the Render dashboard, never committed.
+services:
+  - type: web
+    name: shopnest-api
+    runtime: docker
+    rootDir: backend
+    plan: free
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGINS
+        sync: false

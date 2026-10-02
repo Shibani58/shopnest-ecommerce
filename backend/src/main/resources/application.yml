@@ -1,0 +1,44 @@
+# Every value can be overridden with an environment variable (see README "Configuration").
+# With no variables set, the app starts on an in-memory H2 database so it runs out of the box.
+
+server:
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: shopnest
+  datasource:
+    url: ${DB_URL:jdbc:h2:mem:shopnest;MODE=PostgreSQL;DB_CLOSE_DELAY=-1}
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        default_batch_fetch_size: 50
+        jdbc:
+          time_zone: UTC
+
+app:
+  jwt:
+    # Base64-encoded, at least 256 bits. ALWAYS override JWT_SECRET in production.
+    secret: ${JWT_SECRET:c2hvcG5lc3QtbG9jYWwtZGV2ZWxvcG1lbnQtc2VjcmV0LWtleS1jaGFuZ2UtbWU=}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+  cors:
+    allowed-origins: ${CORS_ORIGINS:http://localhost:4200}
+  seed:
+    enabled: ${SEED_DATA:true}
+    admin-email: ${ADMIN_EMAIL:admin@shopnest.dev}
+    admin-password: ${ADMIN_PASSWORD:Admin@123}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

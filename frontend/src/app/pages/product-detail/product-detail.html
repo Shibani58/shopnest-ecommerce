@@ -1,0 +1,146 @@
+<div class="container section">
+  @if (load(); as l) {
+    @if (l.state === 'loading') {
+      <div class="spinner" aria-label="Loading"></div>
+    } @else if (l.state === 'error') {
+      <div class="empty">
+        <h2>Product unavailable</h2>
+        <p>{{ l.message }}</p>
+        <a routerLink="/products" class="btn btn-ghost">Back to the shop</a>
+      </div>
+    } @else if (l.state === 'ready') {
+      @let p = l.product;
+      <nav class="crumbs small">
+        <a routerLink="/products">Shop</a> /
+        <a routerLink="/products" [queryParams]="{ categoryId: p.categoryId }">{{ p.categoryName }}</a> /
+        <span class="muted">{{ p.name }}</span>
+      </nav>
+
+      <div class="detail">
+        <div class="gallery panel">
+          <app-product-image [src]="p.imageUrl" [alt]="p.name" />
+        </div>
+
+        <div class="info">
+          <h1>{{ p.name }}</h1>
+          <div class="row">
+            <app-star-rating [value]="p.averageRating" />
+            <a href="#reviews" class="small">
+              {{ p.reviewCount ? p.averageRating + ' · ' + p.reviewCount + ' reviews' : 'No reviews yet' }}
+            </a>
+          </div>
+
+          <div class="price-box">
+            <span class="price">{{ p.sellingPrice | currency: 'INR' : 'symbol' : '1.0-2' }}</span>
+            @if (p.discountPercent > 0) {
+              <span class="mrp">{{ p.price | currency: 'INR' : 'symbol' : '1.0-2' }}</span>
+              <span class="badge badge-sale">{{ p.discountPercent }}% off</span>
+            }
+          </div>
+          <p class="muted small">Inclusive of all taxes. Free delivery on orders over ₹999.</p>
+
+          @if (p.stock === 0) {
+            <p class="stock out">Out of stock</p>
+          } @else if (p.stock <= 5) {
+            <p class="stock low">Hurry, only {{ p.stock }} left!</p>
+          } @else {
+            <p class="stock in">In stock</p>
+          }
+
+          @if (p.stock > 0) {
+            <div class="buy">
+              <label class="field qty">
+                <span class="small">Qty</span>
+                <select class="input" [(ngModel)]="quantity">
+                  @for (n of maxQuantity(p); track n) {
+                    <option [ngValue]="n">{{ n }}</option>
+                  }
+                </select>
+              </label>
+              <button type="button" class="btn btn-primary" [disabled]="adding()" (click)="addToCart(p)">
+                {{ adding() ? 'Adding…' : 'Add to cart' }}
+              </button>
+              <button type="button" class="btn btn-ghost" (click)="buyNow(p)">Buy now</button>
+            </div>
+          }
+          <button type="button" class="link-btn wish" (click)="toggleWishlist(p)">
+            {{ wished() ? '♥ Saved to wishlist' : '♡ Add to wishlist' }}
+          </button>
+
+          @if (p.description) {
+            <div class="description">
+              <h3>About this item</h3>
+              <p>{{ p.description }}</p>
+            </div>
+          }
+        </div>
+      </div>
+
+      <section id="reviews" class="reviews">
+        <h2>Customer reviews</h2>
+        <div class="reviews-layout">
+          <div class="panel summary">
+            <div class="big-rating">{{ p.reviewCount ? p.averageRating : '–' }}</div>
+            <app-star-rating [value]="p.averageRating" style="--star-size: 1.3rem" />
+            <p class="muted small">{{ p.reviewCount }} {{ p.reviewCount === 1 ? 'review' : 'reviews' }}</p>
+
+            @if (auth.isLoggedIn()) {
+              <form class="stack review-form" (ngSubmit)="submitReview()">
+                <h3>{{ myReview() ? 'Update your review' : 'Write a review' }}</h3>
+                <div class="rating-picker" role="radiogroup" aria-label="Rating">
+                  @for (n of [1, 2, 3, 4, 5]; track n) {
+                    <button
+                      type="button"
+                      role="radio"
+                      [attr.aria-checked]="rating === n"
+                      [class.on]="n <= rating"
+                      (click)="rating = n"
+                      [attr.aria-label]="n + ' stars'"
+                    >★</button>
+                  }
+                </div>
+                <div class="field">
+                  <label for="comment">Comment (optional)</label>
+                  <textarea id="comment" name="comment" rows="3" maxlength="1000" [(ngModel)]="comment"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" [disabled]="savingReview()">
+                  {{ savingReview() ? 'Saving…' : 'Submit review' }}
+                </button>
+              </form>
+            } @else {
+              <p class="small"><a routerLink="/login" [queryParams]="{ returnUrl: '/products/' + p.id }">Log in</a> to write a review.</p>
+            }
+          </div>
+
+          <div class="review-list">
+            @for (r of reviews(); track r.id) {
+              <article class="review panel">
+                <div class="row-between">
+                  <div class="row">
+                    <app-star-rating [value]="r.rating" />
+                    <strong>{{ r.reviewerName }}</strong>
+                    @if (r.verifiedPurchase) {
+                      <span class="badge badge-success">Verified purchase</span>
+                    }
+                  </div>
+                  <span class="muted small">{{ r.createdAt | date: 'mediumDate' }}</span>
+                </div>
+                @if (r.comment) {
+                  <p>{{ r.comment }}</p>
+                }
+                @if (r.reviewerId === auth.user()?.id || auth.isAdmin()) {
+                  <button type="button" class="link-btn small" (click)="deleteReview(r)">Delete</button>
+                }
+              </article>
+            } @empty {
+              <p class="muted">No reviews yet. Be the first to share your thoughts.</p>
+            }
+            @if (!reviewsLast()) {
+              <button type="button" class="btn btn-ghost" (click)="loadReviews(reviewsPage() + 1)">Show more reviews</button>
+            }
+          </div>
+        </div>
+      </section>
+    }
+  }
+</div>

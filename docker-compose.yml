@@ -1,0 +1,28 @@
+# Runs PostgreSQL + the Spring Boot API locally:  docker compose up --build
+# Then start the Angular app with `npm start` in ./frontend and open http://localhost:4200
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: shopnest
+      POSTGRES_USER: shopnest
+      POSTGRES_PASSWORD: shopnest
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    depends_on:
+      - db
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/shopnest
+      DB_USERNAME: shopnest
+      DB_PASSWORD: shopnest
+      CORS_ORIGINS: http://localhost:4200
+    ports:
+      - "8080:8080"
+
+volumes:
+  db-data:
